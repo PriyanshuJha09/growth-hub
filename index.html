@@ -114,7 +114,20 @@
         <input type="checkbox"> DBMS Fundamentals <br>
         <input type="checkbox"> AI Agent Architecture Patterns
     </div>
-    <div class="card" style="border-left-color: #3498db;"> <h2>🔗 Connect With Me</h2>
+    
+<div class="card">
+    <h2>📝 Daily Growth Log</h2>
+    <input type="text" id="logInput" placeholder="What did you learn today?" style="width: 80%; padding: 10px;">
+    <button onclick="saveLog()">Add Log</button>
+    
+    <ul id="logList" style="margin-top: 20px;">
+        </ul>
+    <button onclick="clearLogs()" style="background-color: #e74c3c; margin-top: 10px;">Clear All</button>
+</div>
+
+    <div class="card" style="border-left-color: #3498db;"> 
+        
+        <h2>🔗 Connect With Me</h2>
         <p>Follow my journey as I build AI Agents and hit my fitness goals:</p>
         
         <a href="https://github.com/PriyanshuJha09" target="_blank">View My GitHub</a> | 
@@ -133,6 +146,56 @@ function updateProgress() {
         document.getElementById('progress-bar').style.width = percentage + '%';
         document.getElementById('progress-text').innerHTML = percentage + '% Complete';
     }
+    // This runs as soon as the page loads to show your saved notes
+window.onload = function() {
+    displayLogs();
+};
+
+function saveLog() {
+    const input = document.getElementById('logInput');
+    const category = document.getElementById('logCategory'); // Get the category
+    if (input.value === "") return;
+
+    let logs = JSON.parse(localStorage.getItem('myLogs')) || [];
+    
+    const newEntry = {
+        text: input.value,
+        category: category.value, // Save the category here
+        time: new Date().toLocaleString()
+    };
+    
+    logs.push(newEntry);
+    localStorage.setItem('myLogs', JSON.stringify(logs));
+    
+    input.value = "";
+    displayLogs();
+}
+
+function displayLogs() {
+    const list = document.getElementById('logList');
+    let logs = JSON.parse(localStorage.getItem('myLogs')) || [];
+    list.innerHTML = "";
+    
+    logs.forEach(log => {
+        let li = document.createElement('li');
+        li.style.borderBottom = "1px solid #eee";
+        li.style.padding = "10px 0";
+        
+        li.innerHTML = `
+            <span style="background: #e8f5e9; color: #27ae60; padding: 2px 8px; border-radius: 10px; font-size: 0.7rem; font-weight: bold;">
+                ${log.category}
+            </span>
+            <small style="color: #95a5a6; margin-left: 10px;">${log.time}</small><br>
+            <div style="margin-top: 5px;">${log.text}</div>
+        `;
+        list.appendChild(li);
+    });
+}
+
+function clearLogs() {
+    localStorage.removeItem('myLogs');
+    displayLogs();
+}
     </script>
 </body>
 
