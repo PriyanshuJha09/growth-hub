@@ -3,7 +3,27 @@
 <head>
     <style>
     /* This is a CSS Comment - it doesn't show up on the site */
-    
+    .progress-container {
+        width: 100%;
+        background-color: #e0e0e0;
+        border-radius: 10px;
+        height: 10px;
+        margin-bottom: 5px;
+    }
+
+    #progress-bar {
+        width: 0%; /* Starts at zero */
+        height: 100%;
+        background-color: #27ae60;
+        border-radius: 10px;
+        transition: width 0.5s ease; /* Makes the bar slide smoothly */
+    }
+
+    #progress-text {
+        font-size: 0.8rem;
+        color: #7f8c8d;
+        margin-bottom: 15px;
+    }
     body {
         font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         background-color: #f4f7f6; /* A light, clean grey */
@@ -57,14 +77,20 @@
     <img src="Copy of Profile Photo.png" alt="Priyanshu's Profile" width="200">
     <p>Documenting my path to AI Architect & Peak Fitness.</p>
 
-    <div class="card">
-        <h2>🚀 Tech Goals</h2>
-        <ul>
-            <li>Learn HTML/CSS fundamentals</li>
-            <li>Understand AI Agent Architecture</li>
-            <li>Build 3 Mini-Projects</li>
-        </ul>
+   <div class="card">
+    <h2>🚀 Tech Goals</h2>
+    
+    <div class="progress-container">
+        <div id="progress-bar"></div>
     </div>
+    <p id="progress-text">0% Complete</p>
+
+    <ul>
+        <li><input type="checkbox" class="goal-check" onclick="updateProgress()"> Learn HTML/CSS fundamentals</li>
+        <li><input type="checkbox" class="goal-check" onclick="updateProgress()"> Understand AI Agent Architecture</li>
+        <li><input type="checkbox" class="goal-check" onclick="updateProgress()"> Build 3 Mini-Projects</li>
+    </ul>
+</div>
 
     <div class="card">
         <h2>💪 Fitness & Health</h2>
@@ -94,7 +120,20 @@
         <a href="https://github.com/PriyanshuJha09" target="_blank">View My GitHub</a> | 
         <a href="https://www.linkedin.com/in/priyanshu-kumar-jha-8a63b43ab/" target="_blank">LinkedIn Profile</a>
     </div>
-
+    <script>
+function updateProgress() {
+        // 1. Get all checkboxes
+        const checkboxes = document.querySelectorAll('.goal-check');
+        // 2. Count how many are checked
+        const checkedCount = Array.from(checkboxes).filter(c => c.checked).length;
+        // 3. Calculate percentage
+        const percentage = Math.round((checkedCount / checkboxes.length) * 100);
+        
+        // 4. Update the Bar width and the Text
+        document.getElementById('progress-bar').style.width = percentage + '%';
+        document.getElementById('progress-text').innerHTML = percentage + '% Complete';
+    }
+    </script>
 </body>
 
 
