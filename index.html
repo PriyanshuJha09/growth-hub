@@ -133,65 +133,81 @@
         <a href="https://github.com/PriyanshuJha09" target="_blank">View My GitHub</a> | 
         <a href="https://www.linkedin.com/in/priyanshu-kumar-jha-8a63b43ab/" target="_blank">LinkedIn Profile</a>
     </div>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.10/firebase-database-compat.js"></script>
+
     <script>
-function updateProgress() {
-        // 1. Get all checkboxes
-        const checkboxes = document.querySelectorAll('.goal-check');
-        // 2. Count how many are checked
-        const checkedCount = Array.from(checkboxes).filter(c => c.checked).length;
-        // 3. Calculate percentage
-        const percentage = Math.round((checkedCount / checkboxes.length) * 100);
-        
-        // 4. Update the Bar width and the Text
-        document.getElementById('progress-bar').style.width = percentage + '%';
-        document.getElementById('progress-text').innerHTML = percentage + '% Complete';
-    }
-    // This runs as soon as the page loads to show your saved notes
-window.onload = function() {
-    displayLogs();
-};
+        // 2. Your specific Firebase Configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyAGxUemfy5PzNRrCGPfM-4Slg12nKoJT3o",
+            authDomain: "growth-hub-a5fea.firebaseapp.com",
+            databaseURL: "https://growth-hub-a5fea-default-rtdb.firebaseio.com",
+            projectId: "growth-hub-a5fea",
+            storageBucket: "growth-hub-a5fea.appspot.com",
+            messagingSenderId: "215442116611",
+            appId: "1:215442116611:web:647f946e763388aee23e36"
+        };
 
-function saveLog() {
-    const input = document.getElementById('logInput');
-    if (input.value === "") return;
+        // 3. Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
 
-    let logs = JSON.parse(localStorage.getItem('myLogs')) || [];
-    
-    // Create a JSON object with the note and the current time
-    const newEntry = {
-        text: input.value,
-        time: new Date().toLocaleString() // This grabs the current date & time
-    };
-    
-    logs.push(newEntry);
-    localStorage.setItem('myLogs', JSON.stringify(logs));
-    
-    input.value = "";
-    displayLogs();
-}
+        // 4. Save to Cloud Function
+        function saveLog() {
+            const input = document.getElementById('logInput');
+            const category = document.getElementById('logCategory');
+            if (input.value === "") return;
 
-function displayLogs() {
-    const list = document.getElementById('logList');
-    let logs = JSON.parse(localStorage.getItem('myLogs')) || [];
-    list.innerHTML = "";
-    
-    logs.forEach(log => {
-        let li = document.createElement('li');
-        li.style.marginBottom = "10px"; // Add a little space between logs
-        li.innerHTML = `
-            <small style="color: #27ae60; font-weight: bold;">[${log.time}]</small><br>
-            ${log.text}
-        `;
-        list.appendChild(li);
-    });
-}
-function clearLogs() {
-    localStorage.removeItem('myLogs');
-    displayLogs();
-}
+            // This pushes the data to Google's servers
+            database.ref('logs').push({
+                text: input.value,
+                category: category.value,
+                time: new Date().toLocaleString()
+            });
+
+            input.value = ""; // Clear the box
+        }
+
+        // 5. Listen to Cloud Function (Syncs all devices!)
+        database.ref('logs').on('value', (snapshot) => {
+            const list = document.getElementById('logList');
+            list.innerHTML = ""; // Clear the screen list
+            const data = snapshot.val();
+            
+            if (data) {
+                // Convert the Cloud objects into the list you see on screen
+                Object.keys(data).reverse().forEach(id => {
+                    const log = data[id];
+                    let li = document.createElement('li');
+                    li.style.borderBottom = "1px solid #eee";
+                    li.style.padding = "10px 0";
+                    li.innerHTML = `
+                        <span style="background: #e8f5e9; color: #27ae60; padding: 2px 8px; border-radius: 10px; font-size: 0.7rem; font-weight: bold;">
+                            ${log.category}
+                        </span>
+                        <small style="color: #95a5a6; margin-left: 10px;">${log.time}</small><br>
+                        <div style="margin-top: 5px;">${log.text}</div>
+                    `;
+                    list.appendChild(li);
+                });
+            }
+        });
+
+        // 6. Clear Cloud Function
+        function clearLogs() {
+            if(confirm("Are you sure you want to delete all logs from the Cloud?")) {
+                database.ref('logs').remove();
+            }
+        }
+
+        // Progress Bar Logic (Keep this here too!)
+        function updateProgress() {
+            const checkboxes = document.querySelectorAll('.goal-check');
+            const checkedCount = Array.from(checkboxes).filter(c => c.checked).length;
+            const percentage = Math.round((checkedCount / checkboxes.length) * 100);
+            document.getElementById('progress-bar').style.width = percentage + '%';
+            document.getElementById('progress-text').innerHTML = percentage + '% Complete';
+        }
     </script>
 </body>
-
-
-
 </html>
